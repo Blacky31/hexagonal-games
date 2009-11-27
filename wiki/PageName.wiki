@@ -1,0 +1,6 @@
+#summary *Hexagonal-Games* product backlog.
+
+=*_List of tasks ordered in preferred priority_*= 
+
+== General functionality ==
+===  
