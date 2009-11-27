@@ -1,4 +1,4 @@
-#summary *Hexagonal-Games* product backlog.
+#summary Hexagonal-Games product backlog.
 #labels Featured,Phase-Requirements
 
 =*_List of tasks_*= 
