@@ -6,6 +6,7 @@
 #include <boost/type_traits.hpp>
 
 #include <boost/pool/poolfwd.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "BaseEvaluator.h"
 
@@ -18,18 +19,23 @@ template<
 class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR>
 {
 public:
+	alpha_beta_pruning_evaluator(boost::shared_ptr<cache_container_type>& cache)
+		: m_cache_items_pool(boost::pool<>(sizeof(cached_value_type)))
+	{
+	}
 
-	static position_evaluation_type f2(signed char depth, 
+	position_evaluation_type f2(signed char depth, 
 			const position_type& position, 
 			const position_evaluation_type& alfa, 
-			const position_evaluation_type& beta,
-			cache_container_type& cache);
+			const position_evaluation_type& beta);
 
-	static position_evaluation_type g2(signed char depth, 
+	position_evaluation_type g2(signed char depth, 
 			const position_type& position, 
 			const position_evaluation_type& alfa, 
-			const position_evaluation_type& beta,
-			cache_container_type& cache);
+			const position_evaluation_type& beta);
+private:
+	boost::shared_ptr<cache_container_type> m_cache;
+	boost::pool<> m_cache_items_pool;
 };
 
 template<
@@ -41,11 +47,12 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		signed char depth, 
 		const position_type& position, 
 		const position_evaluation_type& alfa, 
-		const position_evaluation_type& beta,
-		cache_container_type& cache)
+		const position_evaluation_type& beta)
 {
-	position_cache_type position_cache_key = position.cache_key();
-	cached_value_type cache_value(position_cache_key, depth, position_evaluation_type())
+	cached_value_type* p_cache_value = m_cache_items_pool.malloc();
+	p_cache_value->m_key = position.cache_key();
+	p_cache_value->m_depth = depth;
+
 	cache_container_iterator_type* i_cache = cache.find(value);
 	bool cache_was_found = false;
 	if(i_cache != cache.end())
@@ -89,8 +96,8 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	}
 	else
 	{
-		cache_value.m_cached_value = result;
-		cache.insert(new_cache_value);
+		p_cache_value->m_cached_value = result;
+		cache.insert(*p_cache_value);
 	}
 
 	return result;
@@ -106,11 +113,12 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		signed char depth, 
 		const position_type& position, 
 		const position_evaluation_type& alfa, 
-		const position_evaluation_type& beta,
-		cache_container_type& cache)
+		const position_evaluation_type& beta)
 {
-	position_cache_type position_cache_key = position.cache_key();
-	cached_value_type cache_value(position_cache_key, depth, position_evaluation_type())
+	cached_value_type* p_cache_value = m_cache_items_pool.malloc();
+	p_cache_value->m_key = position.cache_key();
+	p_cache_value->m_depth = depth;
+
 	cache_container_iterator_type* i_cache = cache.find(value);
 	bool cache_was_found = false;
 	if(i_cache != cache.end())
@@ -154,8 +162,8 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	}
 	else
 	{
-		cache_value.m_cached_value = result;
-		cache.insert(new_cache_value);
+		p_cache_value->m_cached_value = result;
+		cache.insert(*p_cache_value);
 	}
 
 	return result;
