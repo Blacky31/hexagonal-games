@@ -7,13 +7,13 @@
 
 namespace game { namespace engine {
 
-struct board_cell_position
+struct board_cell_coordinates 
 {
-	signed char m_x;
-	signed char m_y;
+	signed int m_x;
+	signed int m_y;
 };
 
-template <signed char MAX_X, signed char MAX_Y, unsigned char DIRECTION>
+template <signed int X_SIZE, signed int Y_SIZE, unsigned int DIRECTION>
 class square_board_walker;
 
 /*
@@ -29,43 +29,43 @@ square_board_walker directions
  ------------------->
 next_cell return true if next cell is in board
 */
-template <signed char MAX_X, signed char MAX_Y>
-class square_board_walker<MAX_X, MAX_Y, 0>
+template <signed int X_SIZE, signed int Y_SIZE>
+class square_board_walker<X_SIZE, Y_SIZE, 0>
 {
-	static bool next_cell(board_cell_position& cell)
+	static bool next_cell(board_cell_coordinates& cell)
 	{
 		++cell.y;
-		return cell.y <= MAX_Y && cell.y >= 0 && cell.x >= 0 && cell.x <= NAX_X;
+		return cell.y < Y_SIZE && cell.y >= 0 && cell.x >= 0 && cell.x < X_SIZE;
 	}
 };
 
-template <signed char MAX_X, signed char MAX_Y>
-class square_board_walker<MAX_X, MAX_Y, 1>
+template <signed int X_SIZE, signed int Y_SIZE>
+class square_board_walker<X_SIZE, Y_SIZE, 1>
 {
-	static bool next_cell(board_cell_position& cell)
+	static bool next_cell(board_cell_coordinates& cell)
 	{
 		--cell.x;
-		return cell.x >= 0 && cell.x <= NAX_X && cell.y <= MAX_Y && cell.y >= 0;
+		return cell.x >= 0 && cell.x < X_SIZE && cell.y < Y_SIZE && cell.y >= 0;
 	}
 };
 
-template <signed char MAX_X, signed char MAX_Y>
-class square_board_walker<MAX_X, MAX_Y, 2>
+template <signed int X_SIZE, signed int Y_SIZE>
+class square_board_walker<X_SIZE, Y_SIZE, 2>
 {
-	static bool next_cell(board_cell_position& cell)
+	static bool next_cell(board_cell_coordinates& cell)
 	{
 		--cell.y;
-		return cell.y >= 0 && cell.x >= 0 && cell.x <= NAX_X && cell.y <= MAX_Y;
+		return cell.y >= 0 && cell.x >= 0 && cell.x < X_SIZE && cell.y < Y_SIZE;
 	}
 };
 
-template <signed char MAX_X, signed char MAX_Y>
-class square_board_walker<MAX_X, MAX_Y, 3>
+template <signed int X_SIZE, signed int Y_SIZE>
+class square_board_walker<X_SIZE, Y_SIZE, 3>
 {
-	static bool next_cell(board_cell_position& cell)
+	static bool next_cell(board_cell_coordinates& cell)
 	{
 		++cell.x;
-		return cell.x <= NAX_X && cell.y <= MAX_Y && cell.y >= 0 && cell.x >= 0;
+		return cell.x < X_SIZE && cell.y < Y_SIZE && cell.y >= 0 && cell.x >= 0;
 	}
 };
 

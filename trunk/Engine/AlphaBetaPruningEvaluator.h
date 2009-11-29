@@ -5,7 +5,6 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
 
-#include <boost/pool/poolfwd.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "BaseEvaluator.h"
@@ -20,7 +19,6 @@ class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVA
 {
 public:
 	alpha_beta_pruning_evaluator(boost::shared_ptr<cache_container_type>& cache)
-		: m_cache_items_pool(boost::pool<>(sizeof(cached_value_type)))
 	{
 	}
 
@@ -35,7 +33,6 @@ public:
 			const position_evaluation_type& beta);
 private:
 	boost::shared_ptr<cache_container_type> m_cache;
-	boost::pool<> m_cache_items_pool;
 };
 
 template<
@@ -49,9 +46,8 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		const position_evaluation_type& alfa, 
 		const position_evaluation_type& beta)
 {
-	cached_value_type* p_cache_value = m_cache_items_pool.malloc();
-	p_cache_value->m_key = position.cache_key();
-	p_cache_value->m_depth = depth;
+	cached_value_type* p_cache_value = cache_pool_type::malloc();
+	position.generate_cache_key(p_cache_value->m_key);
 
 	cache_container_iterator_type* i_cache = cache.find(value);
 	bool cache_was_found = false;
@@ -96,13 +92,13 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	}
 	else
 	{
+		p_cache_value->m_depth = depth;
 		p_cache_value->m_cached_value = result;
 		cache.insert(*p_cache_value);
 	}
 
 	return result;
 }
-
 
 
 template<
@@ -115,9 +111,8 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		const position_evaluation_type& alfa, 
 		const position_evaluation_type& beta)
 {
-	cached_value_type* p_cache_value = m_cache_items_pool.malloc();
-	p_cache_value->m_key = position.cache_key();
-	p_cache_value->m_depth = depth;
+	cached_value_type* p_cache_value = cache_pool_type::malloc();
+	position.generate_cache_key(p_cache_value->m_key);
 
 	cache_container_iterator_type* i_cache = cache.find(value);
 	bool cache_was_found = false;
@@ -162,6 +157,7 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	}
 	else
 	{
+		p_cache_value->m_depth = depth;
 		p_cache_value->m_cached_value = result;
 		cache.insert(*p_cache_value);
 	}

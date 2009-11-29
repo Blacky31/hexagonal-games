@@ -5,6 +5,8 @@
 
 #include "boost/intrusive/avl_set.hpp"
 
+#include "boost/pool/singleton_pool.hpp"
+
 namespace game { namespace engine {
 
 template<class POSITION>
@@ -12,7 +14,6 @@ class base_position_evaluator
 {
 public:
 	typedef POSITION position_type;
-	typedef typename position_type::cache_type position_cache_type;
 	typedef typename position_type::evaluation_type position_evaluation_type;
 	typedef typename position_type::successor_positions_enumerator_type 
 			position_successor_positions_enumerator_type;
@@ -21,9 +22,6 @@ public:
 	BOOST_CONCEPT_ASSERT((DefaultConstructible<position_evaluation_type>));
 	BOOST_CONCEPT_ASSERT((SignedInteger<position_evaluation_type>));
 
-	BOOST_CONCEPT_ASSERT((Assignable<position_cache_type>));
-	BOOST_CONCEPT_ASSERT((DefaultConstructible<position_cache_type>));
-
 	BOOST_STATIC_ASSERT((boost::is_class<position_type>::value));
 };
 
@@ -31,6 +29,12 @@ template<class POSITION>
 class base_position_evaluator_with_cache : public base_position_evaluator<POSITION>
 {
 public:
+
+	typedef typename position_type::cache_type position_cache_type;
+
+	BOOST_CONCEPT_ASSERT((Assignable<position_cache_type>));
+	BOOST_CONCEPT_ASSERT((DefaultConstructible<position_cache_type>));
+
 	struct cached_value_type : public boost::intrusive::avl_set_base_hook<>
 	{
 		position_cache_type m_key;
@@ -51,6 +55,9 @@ public:
 
 	typedef boost::intrusive::avl_set<cached_value_type, boost::intrusive::constant_time_size<false> > cache_container_type;
 	typedef typename cache_container_type::iterator cache_container_iterator_type;
+
+	typedef boost::singleton_pool<base_position_evaluator_with_cache<position_type>, 
+		sizeof(position_cache_type) > cache_pool_type;
 };
 
 template<
