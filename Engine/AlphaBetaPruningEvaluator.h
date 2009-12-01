@@ -5,22 +5,19 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
 
-#include <boost/shared_ptr.hpp>
-
 #include "BaseEvaluator.h"
+#include "NativeEvaluator.h"
+#include "CacheStrategy.h"
 
 namespace game { namespace engine {
 
 template<
 	class POSITION, 
-	template <class> class FINALLY_EVALUATOR>
-
-class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR>
+	template <class> class FINALLY_EVALUATOR = native_evaluator<POSITION>,
+	template <class> class CACHE_STRATEGY = cache_strategy<POSITION, true> >
+class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>
 {
 public:
-	alpha_beta_pruning_evaluator(boost::shared_ptr<cache_container_type>& cache)
-	{
-	}
 
 	position_evaluation_type f2(signed char depth, 
 			const position_type& position, 
@@ -31,8 +28,9 @@ public:
 			const position_type& position, 
 			const position_evaluation_type& alfa, 
 			const position_evaluation_type& beta);
+
 private:
-	boost::shared_ptr<cache_container_type> m_cache;
+	cahce_strategy_type m_cache;
 };
 
 template<
@@ -46,24 +44,29 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		const position_evaluation_type& alfa, 
 		const position_evaluation_type& beta)
 {
-	cached_value_type* p_cache_value = cache_pool_type::malloc();
-	position.generate_cache_key(p_cache_value->m_key);
+	position_cache_key_type key;
+	cache_container_iterator_type i_cache;
+	bool cache_was_found;
 
-	cache_container_iterator_type* i_cache = cache.find(value);
-	bool cache_was_found = false;
-	if(i_cache != cache.end())
+	if(cahce_strategy_type::use_cache)
 	{
-		cache_was_found = true;
-		// Position was found in cache! So, return stored evaluation value
-		signed char cache_on_depth i_cache->m_depth;
-		if(cache_on_depth >= depth)
-			return i_cache->m_eveluated_value;
+		position.generate_cache_key(key);
+		
+		cache_was_found = m_cache->find_in_cache(key, i_cache);
+		if(cache_was_found)
+		{
+			cache_was_found = true;
+			// Position was found in cache! So, return stored evaluation value
+			signed char cache_on_depth i_cache->m_depth;
+			if(cache_on_depth >= depth)
+				return i_cache->m_eveluated_value;
+		}
 	}
 
 	position_evaluation_type result;
 	if(0 == depth)
 	{
-		position_evaluation_type result = FINALLY_EVALUATOR::f(position);
+		position_evaluation_type result = finally_evaluator_type::f(position);
 	}
 	else
 	{
@@ -85,16 +88,17 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		}
 	}
 	
-	if(cache_was_found)
+	if(cahce_strategy_type::use_cache)
 	{
-		i_cache->m_depth = depth;
-		i_cache->m_eveluated_value = result;
-	}
-	else
-	{
-		p_cache_value->m_depth = depth;
-		p_cache_value->m_cached_value = result;
-		cache.insert(*p_cache_value);
+		if(cache_was_found)
+		{
+			i_cache->m_depth = depth;
+			i_cache->m_eveluated_value = result;
+		}
+		else
+		{
+			m_cache->add_to_cache(key, depth, result);
+		}
 	}
 
 	return result;
@@ -111,12 +115,12 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		const position_evaluation_type& alfa, 
 		const position_evaluation_type& beta)
 {
-	cached_value_type* p_cache_value = cache_pool_type::malloc();
-	position.generate_cache_key(p_cache_value->m_key);
+	position_cache_key_type key;
+	position.generate_cache_key(key);
 
-	cache_container_iterator_type* i_cache = cache.find(value);
-	bool cache_was_found = false;
-	if(i_cache != cache.end())
+	cache_container_iterator_type i_cache;
+	bool cache_was_found = m_cache->find_in_cache(key, i_cache);
+	if(cache_was_found)
 	{
 		cache_was_found = true;
 		// Position was found in cache! So, return stored evaluation value
@@ -128,7 +132,7 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	position_evaluation_type result;
 	if(0 == depth)
 	{
-		position_evaluation_type result = FINALLY_EVALUATOR::f(position);
+		position_evaluation_type result = finally_evaluator_type::f(position);
 	}
 	else
 	{
@@ -157,9 +161,7 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	}
 	else
 	{
-		p_cache_value->m_depth = depth;
-		p_cache_value->m_cached_value = result;
-		cache.insert(*p_cache_value);
+		m_cache->add_to_cache(key, depth, result);
 	}
 
 	return result;
