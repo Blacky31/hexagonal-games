@@ -32,7 +32,7 @@ next_cell return true if next cell is in board
 template <signed int X_SIZE, signed int Y_SIZE>
 class square_board_walker<X_SIZE, Y_SIZE, 0>
 {
-	static bool next_cell(board_cell_coordinates& cell)
+	static inline bool next_cell(board_cell_coordinates& cell)
 	{
 		++cell.y;
 		return cell.y < Y_SIZE && cell.y >= 0 && cell.x >= 0 && cell.x < X_SIZE;
@@ -42,7 +42,7 @@ class square_board_walker<X_SIZE, Y_SIZE, 0>
 template <signed int X_SIZE, signed int Y_SIZE>
 class square_board_walker<X_SIZE, Y_SIZE, 1>
 {
-	static bool next_cell(board_cell_coordinates& cell)
+	static inline bool next_cell(board_cell_coordinates& cell)
 	{
 		--cell.x;
 		return cell.x >= 0 && cell.x < X_SIZE && cell.y < Y_SIZE && cell.y >= 0;
@@ -52,7 +52,7 @@ class square_board_walker<X_SIZE, Y_SIZE, 1>
 template <signed int X_SIZE, signed int Y_SIZE>
 class square_board_walker<X_SIZE, Y_SIZE, 2>
 {
-	static bool next_cell(board_cell_coordinates& cell)
+	static inline bool next_cell(board_cell_coordinates& cell)
 	{
 		--cell.y;
 		return cell.y >= 0 && cell.x >= 0 && cell.x < X_SIZE && cell.y < Y_SIZE;
@@ -62,7 +62,7 @@ class square_board_walker<X_SIZE, Y_SIZE, 2>
 template <signed int X_SIZE, signed int Y_SIZE>
 class square_board_walker<X_SIZE, Y_SIZE, 3>
 {
-	static bool next_cell(board_cell_coordinates& cell)
+	static inline bool next_cell(board_cell_coordinates& cell)
 	{
 		++cell.x;
 		return cell.x < X_SIZE && cell.y < Y_SIZE && cell.y >= 0 && cell.x >= 0;

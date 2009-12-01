@@ -78,6 +78,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CacheStrategy.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Engine.h"
 				>
 			</File>

@@ -3,7 +3,7 @@
 
 #include <boost/static_assert.hpp>
 #include <boost/concept/assert.hpp>
-#include <boost/proto/repeat.hpp>
+#include <boost/foreach.hpp>
 
 #include <boost/array.hpp>
 
@@ -63,21 +63,22 @@ struct game_board
 		}
 	}
 
-	const cell_type& cell(const board_cell_coordinates& coordinates) const
+	inline const cell_type& cell(const board_cell_coordinates& coordinates) const
 	{
 		return m_board[coordinates.m_y][coordinates.m_x];
 	}
 
-	cell_type& cell(const board_cell_coordinates& coordinates)
+	inline cell_type& cell(const board_cell_coordinates& coordinates)
 	{
 		return m_board[coordinates.m_y][coordinates.m_x];
 	}
 
-	static player_type switch_player(player_type player)
+	static inline player_type switch_player(player_type player)
 	{
 		return player == player_algorithm ? player_opponent : player_algorithm;
 	}
 
+private:
 	board_type m_board;
 	player_type m_current_player;
 };
