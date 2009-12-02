@@ -1,7 +1,7 @@
 #ifndef __SUUCCESSOR_POSITION_ITERATOR__H
 #define __SUUCCESSOR_POSITION_ITERATOR__H
 
-#include "boost/pool/singleton_pool.hpp"
+#include <boost/pool/singleton_pool.hpp>
 
 #include "../Engine/BoardGeometry.h"
 
@@ -16,24 +16,23 @@ public:
 	typedef boost::singleton_pool<position_type, sizeof(position_type)> pool_type;
 
 	successor_positions_iterator(const position_type& position) : 
-		m_position(position), m_result_buffer(pool_type::malloc()),
+		m_position(position), m_result_buffer(static_cast<position_type*>(pool_type::malloc())),
 		m_current_coordinates(0,0)
 	{}
 
-	const SquareReversiPosition& operator* () const
+	const position_type& operator* () const
 	{
 		return *m_result_buffer;
 	}
 
-	const SquareReversiPosition& operator-> () const
+	const position_type& operator-> () const
 	{
 		return *m_result_buffer;
 	}
 
-protected:
-	const SquareReversiPosition& m_position;
-	SquareReversiPosition* m_result_buffer;
-
+public:
+	const position_type& m_position;
+	position_type* m_result_buffer;
 	board_cell_coordinates m_current_coordinates;
 };
 
@@ -43,8 +42,11 @@ class square_board_stone_successor_positions_iterator : public successor_positio
 {
 public:
 
+    typedef successor_positions_iterator<POSITION> base_type;
+    typedef typename base_type::position_type position_type;
+    
 	square_board_stone_successor_positions_iterator(const position_type& position)
-		: successor_positions_iterator(position), m_isValid(true)
+		: successor_positions_iterator<position_type>(position), m_isValid(true)
 	{}
 
 	operator bool () const
@@ -54,24 +56,24 @@ public:
 
 	square_board_stone_successor_positions_iterator& operator++ ()
 	{
-		*m_result_buffer = m_position;
+		*successor_positions_iterator<position_type>::m_result_buffer = successor_positions_iterator<position_type>::m_position;
 		while(true)
 		{
-			++ m_current_coordinates.m_x;
-			if(m_current_coordinates.m_x >= X_SIZE)
+			++ successor_positions_iterator<position_type>::m_current_coordinates.m_x;
+			if(successor_positions_iterator<position_type>::m_current_coordinates.m_x >= X_SIZE)
 			{
-				m_current_coordinates.m_x = 0;
-				++ m_current_coordinates.m_y;
-				if(m_current_coordinates.m_y >= Y_SIZE)
+				successor_positions_iterator<position_type>::m_current_coordinates.m_x = 0;
+				++ successor_positions_iterator<position_type>::m_current_coordinates.m_y;
+				if(successor_positions_iterator<position_type>::m_current_coordinates.m_y >= Y_SIZE)
 				{
-					isValid = false;
+					m_isValid = false;
 					break;
 				}
 			}
 
 			// is it possible to put stone in this cell?
 
-			if(m_result_buffer->putStoneIfPossible(m_current_coordinates))
+			if(successor_positions_iterator<position_type>::m_result_buffer->putStoneIfPossible(successor_positions_iterator<position_type>::m_current_coordinates))
 			{
 				break;
 			}

@@ -4,7 +4,6 @@
 #include <boost/static_assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/foreach.hpp>
-
 #include <boost/array.hpp>
 
 namespace game { namespace engine {
@@ -17,9 +16,9 @@ struct game_board
 
 	typedef CACHE_ROW_TYPE cache_row_type;
 
-	BOOST_CONCEPT_ASSERT((Assignable<cache_row_type>));
-	BOOST_CONCEPT_ASSERT((DefaultConstructible<cache_row_type>));
-	BOOST_CONCEPT_ASSERT((UnsignedInteger<cache_row_type>));
+//	BOOST_CONCEPT_ASSERT((Assignable<cache_row_type>));
+//	BOOST_CONCEPT_ASSERT((DefaultConstructible<cache_row_type>));
+//	BOOST_CONCEPT_ASSERT((UnsignedInteger<cache_row_type>));
 
 	typedef unsigned char cell_type;
 	typedef cell_type player_type;
@@ -43,7 +42,9 @@ struct game_board
 	typedef boost::array<CACHE_ROW_TYPE, SIZE_Y > cache_type;
 
 	game_board(player_type current_player)
-		: m_board(), m_current_player(current_player)
+		: m_board(), 
+          m_current_player(current_player),
+          m_switched_player(switch_player(current_player))
 	{}
 
 	void generate_cache_key(cache_type& buffer) const
@@ -78,9 +79,10 @@ struct game_board
 		return player == player_algorithm ? player_opponent : player_algorithm;
 	}
 
-private:
+public:
 	board_type m_board;
 	player_type m_current_player;
+    player_type m_switched_player;
 };
 
 }}  // engine, game
