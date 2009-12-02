@@ -10,4 +10,3 @@
 #define SQUAREREVERSIENGINE_API __declspec(dllimport)
 #endif
 
-SQUAREREVERSIENGINE_API int fnSquareReversiEngine(void);

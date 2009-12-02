@@ -4,9 +4,3 @@
 #include "stdafx.h"
 #include "SquareReversiEngine.h"
 
-// This is an example of an exported function.
-SQUAREREVERSIENGINE_API int fnSquareReversiEngine(void)
-{
-	return 42;
-}
-

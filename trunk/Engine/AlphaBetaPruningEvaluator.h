@@ -1,7 +1,7 @@
 #ifndef __MINIMAXEVALUATOR__H
 #define __MINIMAXEVALUATOR__H
 
-#include "boost/concept/assert.hpp"
+#include <boost/concept/assert.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
 
@@ -13,11 +13,20 @@ namespace game { namespace engine {
 
 template<
 	class POSITION, 
-	template <class> class FINALLY_EVALUATOR = native_evaluator<POSITION>,
-	template <class> class CACHE_STRATEGY = cache_strategy<POSITION, true> >
+	template <class> class FINALLY_EVALUATOR,
+	template <class> class CACHE_STRATEGY >
 class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>
 {
 public:
+
+    typedef base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY> base_type;
+    typedef typename base_type::position_type position_type;
+    typedef typename base_type::position_evaluation_type position_evaluation_type;
+    typedef typename base_type::cahce_strategy_type cahce_strategy_type;
+    typedef typename base_type::successor_positions_iterator_type successor_positions_iterator_type;
+    typedef typename base_type::position_cache_key_type position_cache_key_type;
+    typedef typename base_type::cache_container_iterator_type cache_container_iterator_type;
+    typedef typename base_type::finally_evaluator_type finally_evaluator_type;
 
 	position_evaluation_type f2(signed char depth, 
 			const position_type& position, 
@@ -35,13 +44,13 @@ private:
 
 template<
 	class POSITION, 
-	template <class> class FINALLY_EVALUATOR>
-
-static typename base_position_evaluator<POSITION>::position_evaluation_type 
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR>::f2(
+	template <class> class FINALLY_EVALUATOR,
+    template <class> class CACHE_STRATEGY>
+typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::f2(
 		signed char depth, 
 		const position_type& position, 
-		const position_evaluation_type& alfa, 
+		const position_evaluation_type& alpha, 
 		const position_evaluation_type& beta)
 {
 	position_cache_key_type key;
@@ -57,7 +66,7 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 		{
 			cache_was_found = true;
 			// Position was found in cache! So, return stored evaluation value
-			signed char cache_on_depth i_cache->m_depth;
+			signed char cache_on_depth = i_cache->m_depth;
 			if(cache_on_depth >= depth)
 				return i_cache->m_eveluated_value;
 		}
@@ -71,16 +80,15 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	else
 	{
 		result = alpha;
-		for(position_successor_positions_enumerator_type i = position.successor_positions_begin();
-				i != position.successor_positions_end(); ++i)
+		for(successor_positions_iterator_type i = position.successor_iterator_begin();
+				!!i; ++i)
 		{
 			const position_type& i_position = *i;
 			position_evaluation_type t = 
-				alpha_beta_pruning_evaluator<position_type, finally_evaluator_type>::
 					g2(depth - 1, 
 					i_position, 
 					result, beta,
-					cache);
+					m_cache);
 			if(t > result)
 				result = t;
 			if(result >= beta)
@@ -107,12 +115,13 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 
 template<
 	class POSITION, 
-	template <class> class FINALLY_EVALUATOR>
-static typename base_position_evaluator<POSITION>::position_evaluation_type 
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR>::g2(
+	template <class> class FINALLY_EVALUATOR,
+    template <class> class CACHE_STRATEGY>
+typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::g2(
 		signed char depth, 
 		const position_type& position, 
-		const position_evaluation_type& alfa, 
+		const position_evaluation_type& alpha, 
 		const position_evaluation_type& beta)
 {
 	position_cache_key_type key;
@@ -124,7 +133,7 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	{
 		cache_was_found = true;
 		// Position was found in cache! So, return stored evaluation value
-		signed char cache_on_depth i_cache->m_depth;
+		signed char cache_on_depth = i_cache->m_depth;
 		if(cache_on_depth >= depth)
 			return i_cache->m_eveluated_value;
 	}
@@ -137,16 +146,15 @@ static typename base_position_evaluator<POSITION>::position_evaluation_type
 	else
 	{
 		result = beta;
-		for(position_successor_positions_enumerator_type i = position.successor_positions_begin();
-				i != position.successor_positions_end(); ++i)
+		for(successor_positions_iterator_type i = position.successor_positions_begin();
+				!!i; ++i)
 		{
 			const position_type& i_position = *i;
 			position_evaluation_type t = 
-				alpha_beta_pruning_evaluator<position_type, finally_evaluator_type>::
 					f2(depth - 1, 
 					i_position, 
 					alpha, result,
-					cache);
+					m_cache);
 			if(t < result)
 				result = t;
 			if(result <= alpha)
