@@ -1,29 +1,63 @@
 #ifndef __SQUARE_REVERSI_POSITION__H
 #define __SQUARE_REVERSI_POSITION__H
 
+#include <limits>
+
 #include "../Engine/BoardGeometry.h"
 #include "../Engine/GameBoard.h"
-#include "../Engine/SuuccessorPositionsIterator.h"
+#include "SquareReversiSuccessorPositionsIterator.h"
 
 namespace game { namespace square_reversi {
 
-class SquareReversiPosition : public engine::game_board<8, 8, 2, unsigned short>
+class SquareReversiPosition 
+    : public engine::square_game_board<8, 8, 2 /* bits per cell in cache*/, unsigned short>,
+      public engine::pass_counter<2 /* max 2 passes */>
 {
 public:
 	typedef signed int evaluation_type;
-	typedef engine::square_board_stone_successor_positions_iterator<SquareReversiPosition, 8, 8> successor_positions_iterator_type;
+	typedef SquareReversiSuccessorPositionsIterator<SquareReversiPosition, 8, 8>
+        successor_positions_iterator_type;
 
 	typedef engine::square_board_walker<8, 8, 0> wolker0;
 	typedef engine::square_board_walker<8, 8, 1> wolker1;
 	typedef engine::square_board_walker<8, 8, 2> wolker2;
 	typedef engine::square_board_walker<8, 8, 3> wolker3;
 
+	SquareReversiPosition()
+		: engine::square_game_board<8, 8, 2, unsigned short>(cell_algorithm),
+          engine::pass_counter<2>(),
+          m_algorithmStonesOnBoard(0), m_opponentStonesOnBoard(0)
+    {}
+
 	SquareReversiPosition(player_type current_player)
-		: engine::game_board<8, 8, 2, unsigned short>(current_player)
+		: engine::square_game_board<8, 8, 2, unsigned short>(current_player),
+          engine::pass_counter<2>(),
+          m_algorithmStonesOnBoard(0), m_opponentStonesOnBoard(0)
 	{}
 
-    template<class WALKER>
-    bool testCell(const engine::board_cell_coordinates startCoordinates)
+    inline void putStoneInCell(cell_type& cell, const cell_type& newValue)
+    {
+        if(cell != newValue)
+        {
+            if(cell != cell_empty)
+            {
+                if(cell == cell_algorithm)
+                    --m_algorithmStonesOnBoard;
+                else
+                    --m_opponentStonesOnBoard;
+            }
+        
+            if(newValue == cell_algorithm)
+                ++m_algorithmStonesOnBoard;
+            else
+                ++m_opponentStonesOnBoard;
+                
+            cell = newValue;
+        }
+    }
+
+    template<class WALKER, bool PUT_STONE>
+    inline bool testMoveToCell(const engine::board_cell_coordinates startCoordinates)
     {
 		// try to walk in any direction and find opponent stone near (x,y) cell
 		bool ok = false;
@@ -46,50 +80,118 @@ public:
 						break;
 					}
 				}
-				if(ok)
-				{
-					// put new stone and change all stones to current player
-					for(engine::board_cell_coordinates c = startCoordinates; c != coord; WALKER::next_cell(coord))
+                if(PUT_STONE)
+                {
+                    if(ok)
                     {
-                        cell(coord) = m_current_player;
+                        // put new stone and change all stones to current player
+                        for(engine::board_cell_coordinates c = startCoordinates; c != coord; 
+                                WALKER::next_cell(coord))
+                        {
+                            putStoneInCell(cell(coord), m_current_player);
+                        }
                     }
-				}
+                }
 			}
 		}
         
         return ok;
     }
 
-	// called from square_board_stone_successor_positions_iterator
-	bool putStoneIfPossible(const engine::board_cell_coordinates& coordinates)
-	{
+    inline bool isPossiblePutStone(const engine::board_cell_coordinates& coordinates,
+        unsigned char& direction)
+    {
 		cell_type& current_cell = cell(coordinates);
 		// test is it empty
 		if(current_cell != cell_empty)
 			return false;
-		
-        bool ok = false;
-        
+            
 		// try to walk in any direction and find opponent stone near (x,y) cell
 		// direction 0
-        ok |= testCell<wolker0>(coordinates);
+        if(testMoveToCell<wolker0, false>(coordinates))
+        {
+            direction = 0;
+            return true;
+        }
         
 		// direction 1
-        ok |= testCell<wolker1>(coordinates);
+        if(testMoveToCell<wolker1, false>(coordinates))
+        {
+            direction = 1;
+            return true;
+        }
 
 		// direction 2
-        ok |= testCell<wolker2>(coordinates);
+        if(testMoveToCell<wolker2, false>(coordinates))
+        {
+            direction = 2;
+            return true;
+        }
 
 		// direction 3
-        ok |= testCell<wolker3>(coordinates);
+        if(testMoveToCell<wolker3, false>(coordinates))
+        {
+            direction = 3;
+            return true;
+        }
         
-        return ok;
-	}
-    
-    successor_positions_iterator_type successor_iterator_begin()
-    {
-        return successor_positions_iterator_type(*this);
+        return false;
     }
+
+	// called from square_board_stone_successor_positions_iterator
+	inline void putStone(const engine::board_cell_coordinates& coordinates,
+        unsigned char direction)
+	{
+		// try to walk in any direction and find opponent stone near (x,y) cell
+        switch(direction)
+        {
+            case 0: testMoveToCell<wolker0, true>(coordinates);
+            case 1: testMoveToCell<wolker1, true>(coordinates);
+            case 2: testMoveToCell<wolker2, true>(coordinates);
+            case 3: testMoveToCell<wolker3, true>(coordinates);
+        }
+	}
+        
+    inline void successor_iterator_begin(successor_positions_iterator_type& i) const
+    {
+        i.begin_on_position(*this);
+    }
+
+    inline bool terminal_position_preanalize(evaluation_type& result) const
+    {
+        if(is_pass_max() || 64 == (m_algorithmStonesOnBoard + m_opponentStonesOnBoard))
+        {
+            result = terminal_position_evaluate();
+            return true;
+        }
+        
+        return false;
+    }    
+    
+    inline evaluation_type terminal_position_evaluate() const
+    {
+        evaluation_type result = 0;
+        
+        if(m_algorithmStonesOnBoard > m_opponentStonesOnBoard)
+        {
+            result = std::numeric_limits<evaluation_type>::max();
+        }
+        else if(m_algorithmStonesOnBoard < m_opponentStonesOnBoard)
+        {
+            result = std::numeric_limits<evaluation_type>::min();
+        }
+
+        return result;
+    }
+    
+    inline evaluation_type evaluate() const
+    {
+        return m_algorithmStonesOnBoard - m_opponentStonesOnBoard;
+    }
+    
+private:
+    unsigned char m_algorithmStonesOnBoard;
+    unsigned char m_opponentStonesOnBoard;
 };
 
 }} //square_reversi, game

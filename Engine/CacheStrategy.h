@@ -93,7 +93,7 @@ public:
 
 	static void dealloc_cached_value(cached_value_type* p_value)
 	{
-		::operator delete(sizeof(p_value));
+		::operator delete(p_value);
 	}
 };
 
@@ -124,7 +124,7 @@ public:
 		}
 	}
 
-	bool find_in_cache(const position_cache_key_type& key, cache_container_iterator_type& out_iterator)
+	bool find_in_cache(const position_cache_key_type& key, cache_container_iterator_type& out_iterator) const
 	{
 		out_iterator = m_cache->find(key, base_cache_strategy<POSITION>::compare_key_value);
 		if(out_iterator == m_cache->end())
@@ -168,15 +168,15 @@ public:
 
 	BOOST_STATIC_CONSTANT(bool, use_cache = false);
 
-	inline bool find_in_cache(const position_cache_key_type&, cache_container_iterator_type&)
+	inline bool find_in_cache(const position_cache_key_type&, cache_container_iterator_type&) const
 	{
 		return false;
 	}
 
-	inline void add_to_cache(const position_cache_key_type& key, signed char, const cached_value_type&)
+	inline void add_to_cache(const position_cache_key_type&, signed char, const cached_value_type&)
 	{
 
-	}
+	}    
 };
 
 }} // engine, game

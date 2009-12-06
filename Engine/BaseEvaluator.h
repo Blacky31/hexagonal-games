@@ -15,7 +15,6 @@ public:
 	typedef typename position_type::successor_positions_iterator_type 
 			successor_positions_iterator_type;
             
-            
 //	BOOST_CONCEPT_ASSERT((boost::concept::Assignable<position_evaluation_type>));
 //	BOOST_CONCEPT_ASSERT((DefaultConstructible<position_evaluation_type>));
 //	BOOST_CONCEPT_ASSERT((SignedInteger<position_evaluation_type>));

@@ -18,3 +18,15 @@ typedef game::engine::alpha_beta_pruning_evaluator<
             game::engine::native_evaluator,
             game::engine::boostpool_cache_strategy >
         SquareReversiEvaluator;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::stdnew_cache_strategy >
+        SquareReversiEvaluator2;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::no_cache_strategy >
+        SquareReversiEvaluator3;        
