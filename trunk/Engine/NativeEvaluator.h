@@ -16,7 +16,7 @@ public:
     
 	static position_evaluation_type f(const position_type& position)
 	{
-		return position.evaluate();
+        return position.evaluate();
 	}
 };
 

@@ -10,3 +10,5 @@
 #include "test.h"
 
 SquareReversiEvaluator evaluator;
+SquareReversiEvaluator2 e2;
+SquareReversiEvaluator3 e3;

@@ -10,7 +10,7 @@ namespace game { namespace engine {
 
 template <unsigned int SIZE_X, unsigned int SIZE_Y, 
 	unsigned int BITS_PER_CELL_IN_CACHE, class CACHE_ROW_TYPE>
-struct game_board
+struct square_game_board
 {
 	BOOST_STATIC_ASSERT((SIZE_X * BITS_PER_CELL_IN_CACHE) <= (sizeof(CACHE_ROW_TYPE)*8));
 
@@ -38,10 +38,10 @@ struct game_board
 	};
 
 	typedef boost::array<cell_type, SIZE_X> row_type;
-	typedef boost::array<row_type, SIZE_Y > board_type;
-	typedef boost::array<CACHE_ROW_TYPE, SIZE_Y > cache_type;
+	typedef boost::array<row_type, SIZE_Y> board_type;
+	typedef boost::array<CACHE_ROW_TYPE, SIZE_Y> cache_type;
 
-	game_board(player_type current_player)
+	square_game_board(player_type current_player)
 		: m_board(), 
           m_current_player(current_player),
           m_switched_player(switch_player(current_player))
@@ -79,10 +79,34 @@ struct game_board
 		return player == player_algorithm ? player_opponent : player_algorithm;
 	}
 
+    inline void switch_player()
+    {
+       player_type t =  m_current_player;
+       m_current_player = m_switched_player;
+       m_switched_player = t;
+    }
+
 public:
 	board_type m_board;
 	player_type m_current_player;
     player_type m_switched_player;
+};
+
+template <unsigned char MAX_PASS>
+class pass_counter
+{
+public:
+    inline bool is_pass_max() const
+    {
+        return m_passCounter == MAX_PASS;
+    }
+
+    inline void apply_pass()
+    {
+        ++m_passCounter;
+    }
+private:
+    unsigned char m_passCounter;
 };
 
 }}  // engine, game

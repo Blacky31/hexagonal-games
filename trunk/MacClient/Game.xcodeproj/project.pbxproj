@@ -7121,6 +7121,10 @@
 		E3F3DC2010C66CA700D990A5 /* EngineBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineBridge.mm; sourceTree = "<group>"; };
 		E3F3DD1310C674DC00D990A5 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		E3F3DD1410C674DC00D990A5 /* test.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = test.cpp; sourceTree = "<group>"; };
+		E3F9A07D10CBF91400899C48 /* SquareReversiSuccessorPositionsIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareReversiSuccessorPositionsIterator.h; sourceTree = "<group>"; };
+		E3F9A0CE10CC20ED00899C48 /* SimpleCacheStrategyHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCacheStrategyHelper.h; sourceTree = "<group>"; };
+		E3F9A0D110CC233400899C48 /* CacheStrategyHelper_AllTransformsInCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CacheStrategyHelper_AllTransformsInCache.h; sourceTree = "<group>"; };
+		E3F9A0D210CC292D00899C48 /* SquareReversiTransformPositionsIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareReversiTransformPositionsIterator.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -19025,6 +19029,8 @@
 				E375AB6F10C6815B007DB7E8 /* BaseEvaluator.h */,
 				E375AB7010C6815B007DB7E8 /* BoardGeometry.h */,
 				E375AB7110C6815B007DB7E8 /* CacheStrategy.h */,
+				E3F9A0CE10CC20ED00899C48 /* SimpleCacheStrategyHelper.h */,
+				E3F9A0D110CC233400899C48 /* CacheStrategyHelper_AllTransformsInCache.h */,
 				E375AB7210C6815B007DB7E8 /* Engine.h */,
 				E375AB7410C6815B007DB7E8 /* GameBoard.h */,
 				E375AB7510C6815B007DB7E8 /* MonteCarloEvaluator.h */,
@@ -19041,6 +19047,8 @@
 				E375AB7F10C6815B007DB7E8 /* SquareReversiEngine.cpp */,
 				E375AB8010C6815B007DB7E8 /* SquareReversiEngine.h */,
 				E375AB8210C6815B007DB7E8 /* SquareReversiPosition.h */,
+				E3F9A07D10CBF91400899C48 /* SquareReversiSuccessorPositionsIterator.h */,
+				E3F9A0D210CC292D00899C48 /* SquareReversiTransformPositionsIterator.h */,
 				E375AB8310C6815B007DB7E8 /* stdafx.cpp */,
 				E375AB8410C6815B007DB7E8 /* stdafx.h */,
 				E375AB8510C6815B007DB7E8 /* targetver.h */,

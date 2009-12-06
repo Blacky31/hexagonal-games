@@ -5,6 +5,8 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
 
+#include <map>
+
 #include "BaseEvaluator.h"
 #include "NativeEvaluator.h"
 #include "CacheStrategy.h"
@@ -27,6 +29,7 @@ public:
     typedef typename base_type::position_cache_key_type position_cache_key_type;
     typedef typename base_type::cache_container_iterator_type cache_container_iterator_type;
     typedef typename base_type::finally_evaluator_type finally_evaluator_type;
+    typedef cache_strategy_helper<POSITION, CACHE_STRATEGY> cache_strategy_helper_type;
 
 	position_evaluation_type f2(signed char depth, 
 			const position_type& position, 
@@ -39,13 +42,13 @@ public:
 			const position_evaluation_type& beta);
 
 private:
-	cahce_strategy_type m_cache;
+	cahce_strategy_type m_cache;    
 };
 
 template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
-    template <class> class CACHE_STRATEGY>
+    template <class> class CACHE_STRATEGY >
 typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
 	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::f2(
 		signed char depth, 
@@ -53,62 +56,50 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
 		const position_evaluation_type& alpha, 
 		const position_evaluation_type& beta)
 {
-	position_cache_key_type key;
-	cache_container_iterator_type i_cache;
-	bool cache_was_found;
-
-	if(cahce_strategy_type::use_cache)
-	{
-		position.generate_cache_key(key);
-		
-		cache_was_found = m_cache->find_in_cache(key, i_cache);
-		if(cache_was_found)
-		{
-			cache_was_found = true;
-			// Position was found in cache! So, return stored evaluation value
-			signed char cache_on_depth = i_cache->m_depth;
-			if(cache_on_depth >= depth)
-				return i_cache->m_eveluated_value;
-		}
+    position_evaluation_type result;
+ 
+    cache_strategy_helper_type helper(position, depth, m_cache);
+    bool need_return = helper.pre_evaluate(result);
+    if(need_return)
+        return result;
+    
+    if(!position->terminal_position_preanalize(result))
+    {
+        if(0 >= depth)
+        {
+            position_evaluation_type result = finally_evaluator_type::f(position);
+        }
+        else
+        {
+            result = alpha;
+            successor_positions_iterator_type i;
+            position.successor_iterator_begin(i);
+            if(!i)
+            {
+                // it is terminal position
+                result = position->terminal_position_evaluate();
+            }
+            else 
+            { 
+                for(; i; ++i)
+                {
+                    const position_type& i_position = *i;
+                    position_evaluation_type t = 
+                            g2(depth - 1, 
+                            i_position, 
+                            result, beta,
+                            m_cache);
+                    if(t > result)
+                        result = t;
+                    if(result >= beta)
+                        break;
+                }
+            }
+        }
 	}
-
-	position_evaluation_type result;
-	if(0 == depth)
-	{
-		position_evaluation_type result = finally_evaluator_type::f(position);
-	}
-	else
-	{
-		result = alpha;
-		for(successor_positions_iterator_type i = position.successor_iterator_begin();
-				!!i; ++i)
-		{
-			const position_type& i_position = *i;
-			position_evaluation_type t = 
-					g2(depth - 1, 
-					i_position, 
-					result, beta,
-					m_cache);
-			if(t > result)
-				result = t;
-			if(result >= beta)
-				break;
-		}
-	}
-	
-	if(cahce_strategy_type::use_cache)
-	{
-		if(cache_was_found)
-		{
-			i_cache->m_depth = depth;
-			i_cache->m_eveluated_value = result;
-		}
-		else
-		{
-			m_cache->add_to_cache(key, depth, result);
-		}
-	}
-
+    
+    helper.post_evaluate(result);
+    
 	return result;
 }
 
@@ -116,7 +107,7 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
 template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
-    template <class> class CACHE_STRATEGY>
+    template <class> class CACHE_STRATEGY >
 typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
 	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::g2(
 		signed char depth, 
@@ -124,53 +115,51 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
 		const position_evaluation_type& alpha, 
 		const position_evaluation_type& beta)
 {
-	position_cache_key_type key;
-	position.generate_cache_key(key);
-
-	cache_container_iterator_type i_cache;
-	bool cache_was_found = m_cache->find_in_cache(key, i_cache);
-	if(cache_was_found)
-	{
-		cache_was_found = true;
-		// Position was found in cache! So, return stored evaluation value
-		signed char cache_on_depth = i_cache->m_depth;
-		if(cache_on_depth >= depth)
-			return i_cache->m_eveluated_value;
-	}
-
-	position_evaluation_type result;
-	if(0 == depth)
-	{
-		position_evaluation_type result = finally_evaluator_type::f(position);
-	}
-	else
-	{
-		result = beta;
-		for(successor_positions_iterator_type i = position.successor_positions_begin();
-				!!i; ++i)
-		{
-			const position_type& i_position = *i;
-			position_evaluation_type t = 
-					f2(depth - 1, 
-					i_position, 
-					alpha, result,
-					m_cache);
-			if(t < result)
-				result = t;
-			if(result <= alpha)
-				break;
-		}
-	}
+    position_evaluation_type result;
+ 
+    cache_strategy_helper_type helper(position, depth, m_cache);
+    bool need_return = helper.pre_evaluate(result);
+    if(need_return)
+        return result;
+    
+    if(!position->terminal_position_preanalize(result))
+    {
+        if(0 >= depth)
+        {
+            position_evaluation_type result = finally_evaluator_type::f(position);
+        }
+        else
+        {
+            result = beta;
+            successor_positions_iterator_type i;
+            position.successor_iterator_begin(i);
+            if(!i)
+            {
+                // it is terminal position
+                result = position->terminal_position_evaluate();
+            }
+            else 
+            { 
+                for(; i; ++i)
+                {
+                    {
+                        const position_type& i_position = *i;
+                        position_evaluation_type t = 
+                                f2(depth - 1, 
+                                i_position, 
+                                alpha, result,
+                                m_cache);
+                        if(t < result)
+                            result = t;
+                        if(result <= alpha)
+                            break;
+                    }
+                }
+            }
+        }
+    }
 	
-	if(cache_was_found)
-	{
-		i_cache->m_depth = depth;
-		i_cache->m_eveluated_value = result;
-	}
-	else
-	{
-		m_cache->add_to_cache(key, depth, result);
-	}
+    helper.post_evaluate(result);
 
 	return result;
 }
