@@ -82,6 +82,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CacheStrategyHelper_AllTransformsInCache.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CacheStrategyHelper_OneTransformInCache.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Engine.h"
 				>
 			</File>
@@ -95,6 +103,14 @@
 			</File>
 			<File
 				RelativePath=".\NativeEvaluator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SimpleCacheStrategyHelper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SquareBoardTransformer.h"
 				>
 			</File>
 			<File

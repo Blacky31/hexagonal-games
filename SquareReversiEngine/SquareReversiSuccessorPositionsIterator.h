@@ -3,7 +3,6 @@
  *  Game
  *
  *  Created by Viktor Zhuravel on 12/6/09.
- *  Copyright 2009 Kring. All rights reserved.
  *
  */
 
@@ -12,16 +11,26 @@
 
 #include "SquareReversiPosition.h"
 
-#include "BoardGeometry.h"
+#include "../Engine/BoardGeometry.h"
 
 namespace game { namespace square_reversi {
 
-template <class POSITION, signed int X_SIZE, signed int Y_SIZE>
+template <class POSITION, signed int SIZE>
 class SquareReversiSuccessorPositionsIterator
 {
 public:
 
     typedef POSITION position_type;
+
+	SquareReversiSuccessorPositionsIterator(const position_type& position)
+		: m_current_coordinates(0, 0),
+		  m_result_buffer(),
+		  m_position(&position),
+		  m_isValid(true),
+		  m_move_was_generated(false)
+	{
+		next_position();
+	}
 
     // there are no operators "==" , "!="
     // user's code should call "operator bool ()" instead of "!= end"
@@ -54,6 +63,8 @@ public:
         m_current_coordinates.m_y = 0;
         m_isValid = true;
         m_move_was_generated = false;
+
+		next_position();
     }
 
 private:
@@ -65,7 +76,7 @@ private:
 
     inline void next_position()
     {
-        if(m_current_coordinates.m_y >= Y_SIZE)
+        if(m_current_coordinates.m_y >= SIZE)
         {
             process_out_off_board();
             return;
@@ -73,11 +84,11 @@ private:
 
 		for(;true;++m_current_coordinates.m_x)
 		{
-			if(m_current_coordinates.m_x >= X_SIZE)
+			if(m_current_coordinates.m_x >= SIZE)
 			{
 				m_current_coordinates.m_x = 0;
 				++m_current_coordinates.m_y;
-				if(m_current_coordinates.m_y >= Y_SIZE)
+				if(m_current_coordinates.m_y >= SIZE)
 				{
                     process_out_off_board();
 					break;
@@ -91,7 +102,7 @@ private:
 
     inline void process_out_off_board()
     {
-        if(!m_move_was_generated && m_position->is_pass_possible())
+        if(!m_move_was_generated && !m_position->is_pass_max())
         {
             m_result_buffer = *m_position;
             m_result_buffer.apply_pass();
@@ -104,7 +115,7 @@ private:
     }    
 
     // returns true if it is needed to break loop
-    inline bool process_in_board()
+	inline bool process_in_board()
     {
         // is it possible to put stone in this cell?
         unsigned char direction;
@@ -120,7 +131,6 @@ private:
     }
 
 private:
-
     engine::board_cell_coordinates m_current_coordinates;
     position_type m_result_buffer;
     const position_type* m_position;

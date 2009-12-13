@@ -231,6 +231,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SquareReversiSuccessorPositionsIterator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SquareReversiTransformPositionsIterator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>

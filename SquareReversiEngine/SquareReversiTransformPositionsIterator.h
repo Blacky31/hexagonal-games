@@ -3,7 +3,6 @@
  *  Game
  *
  *  Created by Viktor Zhuravel on 12/6/09.
- *  Copyright 2009 Kring. All rights reserved.
  *
  */
 
@@ -12,17 +11,28 @@
 
 #include "SquareReversiPosition.h"
 
-#include "BoardGeometry.h"
+#include "../Engine/BoardGeometry.h"
+#include "../Engine/SquareBoardTransformer.h"
 
 namespace game { namespace square_reversi {
 
-template <class POSITION, signed int X_SIZE, signed int Y_SIZE>
+template <class POSITION, signed int SIZE>
 class SquareReversiTransformPositionsIterator
 {
 public:
 
     typedef POSITION position_type;
     typedef typename position_type::cache_type cache_type;
+
+	SquareReversiTransformPositionsIterator(const position_type& position)
+		: m_current_transformation_number(0),
+		  m_cache_value(),
+		  m_original_position(&position),
+		  m_transformed_position(),
+		  m_isValid(true)
+	{
+		next_position();
+	}
 
     // there are no operators "==" , "!="
     // user's code should call "operator bool ()" instead of "!= end"
@@ -40,19 +50,21 @@ public:
 
 	inline const cache_type& operator* () const
 	{
-		return m_cache_calue;
+		return m_cache_value;
 	}
 
 	inline const cache_type& operator-> () const
 	{
-		return m_cache_calue;
+		return m_cache_value;
 	}
 
     inline void begin_on_position(const position_type& position)
     {
-        m_position = &position;
+        m_original_position = &position;
         m_isValid = true;
         m_current_transformation_number = 0;
+
+		next_position();
     }
 
 private:
@@ -70,21 +82,33 @@ private:
            return; 
         }
         
-        
-        
+		typedef engine::square_board_transformer<SIZE>::transfromation_function transfromation_function;
+
+		transfromation_function fun = engine::square_board_transformer<SIZE>::get_function(m_current_transformation_number);
+
+		engine::board_cell_coordinates coord(0, 0);
+
+        for(coord.m_x = 0; coord.m_x < SIZE; ++coord.m_x)
+			for(coord.m_y = 0; coord.m_y < SIZE; ++coord.m_y)
+			{
+				transformed_ccord = fun(coord);
+				m_transformed_position.cell(transformed_ccord) = m_original_position->cell(coord);
+			}
+
+		m_transformed_position.generate_cache_key(m_cache_value);
+
         ++m_current_transformation_number;
     }
 
     
 private:
     unsigned int m_current_transformation_number; 
-    cache_type m_cache_calue;
-    const position_type* m_position;
+    cache_type m_cache_value;
+	const position_type* m_original_position;
+	position_type m_transformed_position;
 	bool m_isValid;
     
     static const unsigned int s_max_transformation_number = 8;
-    
-    
 };
 
 }} // square_reversi, game
