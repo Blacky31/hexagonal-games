@@ -34,7 +34,7 @@ public:
 
 		position_evaluation_type m_evaluated_value;
 		
-		cached_value_type(const position_cache_key_type& key, 
+		inline cached_value_type(const position_cache_key_type& key, 
 			signed char depth, 
 			position_evaluation_type evaluated_value)
 			:	m_key(key),
@@ -67,12 +67,12 @@ public:
 		pool_type::purge_memory();
 	}
 
-	static cached_value_type& alloc_cached_value()
+	inline static cached_value_type& alloc_cached_value()
 	{
 		return *static_cast<cached_value_type*>(pool_type::malloc());
 	}
 	
-	static void dealloc_cached_value(cached_value_type*)
+	inline static void dealloc_cached_value(cached_value_type*)
 	{
 
 	}
@@ -86,12 +86,12 @@ public:
     typedef base_cache_strategy<POSITION> base_type;
     typedef typename base_type::cached_value_type cached_value_type;
 
-	static cached_value_type& alloc_cached_value()
+	inline static cached_value_type& alloc_cached_value()
 	{
 		return *static_cast<cached_value_type*>(::operator new(sizeof(cached_value_type)));
 	}
 
-	static void dealloc_cached_value(cached_value_type* p_value)
+	inline static void dealloc_cached_value(cached_value_type* p_value)
 	{
 		::operator delete(p_value);
 	}
@@ -110,7 +110,7 @@ public:
 
 	BOOST_STATIC_CONSTANT(bool, use_cache = true);
 
-	cache_strategy() : m_cache(new cache_container_type())
+	inline cache_strategy() : m_cache(new cache_container_type())
 	{}
 
 	~cache_strategy()
@@ -124,7 +124,7 @@ public:
 		}
 	}
 
-	bool find_in_cache(const position_cache_key_type& key, cache_container_iterator_type& out_iterator) const
+	inline bool find_in_cache(const position_cache_key_type& key, cache_container_iterator_type& out_iterator) const
 	{
 		out_iterator = m_cache->find(key, base_cache_strategy<POSITION>::compare_key_value);
 		if(out_iterator == m_cache->end())
@@ -135,13 +135,42 @@ public:
 		return true;
 	}
 
-	void add_to_cache(const position_cache_key_type& key, signed char depth, const cached_value_type& value)
+	inline void add_to_cache_without_bad_alloc_handling(const position_cache_key_type& key, signed char depth, const cached_value_type& value)
 	{
 		cached_value_type& cache_value = base_type::alloc_cached_value();
+
 		cache_value.m_key = key;
 		cache_value.m_depth = depth;
 		cache_value.m_cached_value = value;
 		m_cache->insert(cache_value);
+	}
+
+	inline void add_to_cache(const position_cache_key_type& key, signed char depth, const cached_value_type& value)
+	{
+		try
+		{
+			add_to_cache_without_bad_alloc_handling(key, depth, value);
+		}
+		catch(std::bad_alloc& e) // memory abulance
+		{
+			// lear all items in cache
+			if(USE_POOL)
+			{
+				base_type::pool_type::purge_memory();
+			}
+			else
+			{
+				BOOST_FOREACH(cached_value_type& i, *m_cache)
+				{
+					dealloc_cached_value(&i);
+				}
+			}
+			
+			m_cache->clear();
+	
+			// try to alloc again
+			add_to_cache_without_bad_alloc_handling(key, depth, value);
+		}
 	}	
 
 private:
