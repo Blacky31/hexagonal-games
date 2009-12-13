@@ -44,7 +44,8 @@ public:
 			const position_evaluation_type& beta);
 
 private:
-	cahce_strategy_type m_cache;    
+	cahce_strategy_type m_cache_f;    
+	cahce_strategy_type m_cache_g;    
 };
 
 template<
@@ -64,7 +65,7 @@ template<
 {
     position_evaluation_type result;
  
-    cache_strategy_helper_type helper(position, depth, m_cache);
+    cache_strategy_helper_type helper(position, depth, m_cache_f);
     bool need_return = helper.pre_evaluate(result);
     if(need_return)
         return result;
@@ -126,7 +127,7 @@ template<
 {
     position_evaluation_type result;
  
-    cache_strategy_helper_type helper(position, depth, m_cache);
+    cache_strategy_helper_type helper(position, depth, m_cache_g);
     bool need_return = helper.pre_evaluate(result);
     if(need_return)
         return result;
