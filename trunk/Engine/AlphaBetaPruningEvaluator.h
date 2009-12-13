@@ -16,7 +16,9 @@ namespace game { namespace engine {
 template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
-	template <class> class CACHE_STRATEGY >
+	template <class> class CACHE_STRATEGY,
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+
 class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>
 {
 public:
@@ -29,7 +31,7 @@ public:
     typedef typename base_type::position_cache_key_type position_cache_key_type;
     typedef typename base_type::cache_container_iterator_type cache_container_iterator_type;
     typedef typename base_type::finally_evaluator_type finally_evaluator_type;
-    typedef cache_strategy_helper<POSITION, CACHE_STRATEGY> cache_strategy_helper_type;
+	typedef CACHE_STRATEGY_HELPER<POSITION, CACHE_STRATEGY> cache_strategy_helper_type;
 
 	position_evaluation_type f2(signed char depth, 
 			const position_type& position, 
@@ -48,9 +50,13 @@ private:
 template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
-    template <class> class CACHE_STRATEGY >
-typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::f2(
+    template <class> class CACHE_STRATEGY,
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+	
+	typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
+
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER>::
+	f2(
 		signed char depth, 
 		const position_type& position, 
 		const position_evaluation_type& alpha, 
@@ -72,8 +78,7 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
         else
         {
             result = alpha;
-            successor_positions_iterator_type i;
-            position.successor_iterator_begin(i);
+            successor_positions_iterator_type i(position);
             if(!i)
             {
                 // it is terminal position
@@ -86,9 +91,9 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
                     const position_type& i_position = *i;
                     position_evaluation_type t = 
                             g2(depth - 1, 
-                            i_position, 
-                            result, beta,
-                            m_cache);
+								i_position, 
+								result, beta,
+								m_cache);
                     if(t > result)
                         result = t;
                     if(result >= beta)
@@ -107,9 +112,13 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
 template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
-    template <class> class CACHE_STRATEGY >
-typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::g2(
+    template <class> class CACHE_STRATEGY,
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+	
+	typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
+	
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER>::
+	g2(
 		signed char depth, 
 		const position_type& position, 
 		const position_evaluation_type& alpha, 
@@ -131,8 +140,7 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
         else
         {
             result = beta;
-            successor_positions_iterator_type i;
-            position.successor_iterator_begin(i);
+            successor_positions_iterator_type i(position);
             if(!i)
             {
                 // it is terminal position
@@ -146,9 +154,9 @@ typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_e
                         const position_type& i_position = *i;
                         position_evaluation_type t = 
                                 f2(depth - 1, 
-                                i_position, 
-                                alpha, result,
-                                m_cache);
+									i_position, 
+									alpha, result,
+									m_cache);
                         if(t < result)
                             result = t;
                         if(result <= alpha)

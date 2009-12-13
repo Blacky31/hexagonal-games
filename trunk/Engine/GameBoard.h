@@ -8,11 +8,11 @@
 
 namespace game { namespace engine {
 
-template <unsigned int SIZE_X, unsigned int SIZE_Y, 
+template <unsigned int SIZE, 
 	unsigned int BITS_PER_CELL_IN_CACHE, class CACHE_ROW_TYPE>
 struct square_game_board
 {
-	BOOST_STATIC_ASSERT((SIZE_X * BITS_PER_CELL_IN_CACHE) <= (sizeof(CACHE_ROW_TYPE)*8));
+	BOOST_STATIC_ASSERT((SIZE * BITS_PER_CELL_IN_CACHE) <= (sizeof(CACHE_ROW_TYPE)*8));
 
 	typedef CACHE_ROW_TYPE cache_row_type;
 
@@ -37,9 +37,9 @@ struct square_game_board
 		player_opponent = 2
 	};
 
-	typedef boost::array<cell_type, SIZE_X> row_type;
-	typedef boost::array<row_type, SIZE_Y> board_type;
-	typedef boost::array<CACHE_ROW_TYPE, SIZE_Y> cache_type;
+	typedef boost::array<cell_type, SIZE> row_type;
+	typedef boost::array<row_type, SIZE> board_type;
+	typedef boost::array<CACHE_ROW_TYPE, SIZE> cache_type;
 
 	square_game_board(player_type current_player)
 		: m_board(), 

@@ -3,7 +3,6 @@
  *  Game
  *
  *  Created by Viktor Zhuravel on 12/6/09.
- *  Copyright 2009 Kring. All rights reserved.
  *
  */
 
@@ -70,7 +69,7 @@ public:
         }
     }
 
-private:
+protected:
     const position_type& m_position;
     signed char m_depth;
     cache_strategy_type& m_cache_strategy;
