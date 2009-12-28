@@ -17,7 +17,8 @@ template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
 	template <class> class CACHE_STRATEGY,
-	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER,
+	bool USE_STABLE_POSITIONS >
 
 class alpha_beta_pruning_evaluator : public base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>
 {
@@ -28,6 +29,7 @@ public:
     typedef typename base_type::position_evaluation_type position_evaluation_type;
     typedef typename base_type::cahce_strategy_type cahce_strategy_type;
     typedef typename base_type::successor_positions_iterator_type successor_positions_iterator_type;
+	typedef typename base_type::successor_stable_positions_iterator_type successor_stable_positions_iterator_type;
     typedef typename base_type::position_cache_key_type position_cache_key_type;
     typedef typename base_type::cache_container_iterator_type cache_container_iterator_type;
     typedef typename base_type::finally_evaluator_type finally_evaluator_type;
@@ -52,11 +54,12 @@ template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
     template <class> class CACHE_STRATEGY,
-	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER,
+	bool USE_STABLE_POSITIONS >
 	
 	typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
 
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER>::
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER, USE_STABLE_POSITIONS>::
 	f2(
 		signed char depth, 
 		const position_type& position, 
@@ -74,7 +77,35 @@ template<
     {
         if(0 >= depth)
         {
-            position_evaluation_type result = finally_evaluator_type::f(position);
+			if(USE_STABLE_POSITIONS)
+			{
+				successor_stable_positions_iterator_type i(position);
+				result = alpha;
+				if(!i)
+				{
+					result = finally_evaluator_type::f(position);
+				}
+				else 
+				{ 
+					for(; i; ++i)
+					{
+						const position_type& i_position = *i;
+						position_evaluation_type t = 
+								g2(depth - 1, 
+									i_position, 
+									result, beta,
+									m_cache);
+						if(t > result)
+							result = t;
+						if(result >= beta)
+							break;
+					}
+				}
+			}
+			else
+			{
+				result = finally_evaluator_type::f(position);
+			}
         }
         else
         {
@@ -114,11 +145,12 @@ template<
 	class POSITION, 
 	template <class> class FINALLY_EVALUATOR,
     template <class> class CACHE_STRATEGY,
-	template <class, template <class> class > class CACHE_STRATEGY_HELPER >
+	template <class, template <class> class > class CACHE_STRATEGY_HELPER,
+	bool USE_STABLE_POSITIONS >
 	
 	typename base_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY>::position_evaluation_type 
 	
-	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER>::
+	alpha_beta_pruning_evaluator<POSITION, FINALLY_EVALUATOR, CACHE_STRATEGY, CACHE_STRATEGY_HELPER, USE_STABLE_POSITIONS>::
 	g2(
 		signed char depth, 
 		const position_type& position, 
@@ -136,7 +168,35 @@ template<
     {
         if(0 >= depth)
         {
-            position_evaluation_type result = finally_evaluator_type::f(position);
+			if(USE_STABLE_POSITIONS)
+			{
+				successor_stable_positions_iterator_type i(position);
+				result = beta;
+				if(!i)
+				{
+					result = finally_evaluator_type::f(position);
+				}
+				else 
+				{ 
+					for(; i; ++i)
+					{
+						const position_type& i_position = *i;
+						position_evaluation_type t = 
+								f2(depth - 1, 
+									i_position, 
+									result, beta,
+									m_cache);
+						if(t > result)
+							result = t;
+						if(result >= beta)
+							break;
+					}
+				}
+			}
+			else
+			{
+				result = finally_evaluator_type::f(position);
+			}
         }
         else
         {

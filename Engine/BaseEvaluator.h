@@ -14,6 +14,8 @@ public:
 	typedef typename position_type::evaluation_type position_evaluation_type;
 	typedef typename position_type::successor_positions_iterator_type 
 			successor_positions_iterator_type;
+	typedef typename position_type::successor_stable_positions_iterator_type 
+			successor_stable_positions_iterator_type;
             
 //	BOOST_CONCEPT_ASSERT((boost::concept::Assignable<position_evaluation_type>));
 //	BOOST_CONCEPT_ASSERT((DefaultConstructible<position_evaluation_type>));
@@ -35,6 +37,7 @@ public:
 	typedef typename base_type::position_type position_type;
 	typedef typename base_type::position_evaluation_type position_evaluation_type;
 	typedef typename base_type::successor_positions_iterator_type successor_positions_iterator_type;    
+	typedef typename base_type::successor_stable_positions_iterator_type successor_stable_positions_iterator_type;    
 
 	typedef FINALLY_EVALUATOR<position_type> finally_evaluator_type;
 	typedef typename finally_evaluator_type::position_type finally_position_type;

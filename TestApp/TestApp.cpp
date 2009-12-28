@@ -22,21 +22,24 @@ typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::boostpool_cache_strategy,
-			game::engine::simple_cache_strategy_helper>
+			game::engine::simple_cache_strategy_helper,
+			false>
         SquareReversiEvaluator1;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::stdnew_cache_strategy,
-			game::engine::simple_cache_strategy_helper>
+			game::engine::simple_cache_strategy_helper,
+			false>
         SquareReversiEvaluator2;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::no_cache_strategy,
-			game::engine::simple_cache_strategy_helper>
+			game::engine::simple_cache_strategy_helper,
+			false>
         SquareReversiEvaluator3;        
 
 // ---------------------------------
@@ -45,21 +48,24 @@ typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::boostpool_cache_strategy,
-			game::engine::cache_strategy_helper_all_transfroms_in_cache>
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			false>
         SquareReversiEvaluator21;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::stdnew_cache_strategy,
-			game::engine::cache_strategy_helper_all_transfroms_in_cache>
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			false>
         SquareReversiEvaluator22;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::no_cache_strategy,
-			game::engine::cache_strategy_helper_all_transfroms_in_cache>
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			false>
         SquareReversiEvaluator23;        
 
 // ---------------------------------
@@ -68,22 +74,104 @@ typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::boostpool_cache_strategy,
-			game::engine::cache_strategy_helper_one_transfrom_in_cache>
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			false>
         SquareReversiEvaluator31;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::stdnew_cache_strategy,
-			game::engine::cache_strategy_helper_one_transfrom_in_cache>
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			false>
         SquareReversiEvaluator32;
         
 typedef game::engine::alpha_beta_pruning_evaluator<
             game::square_reversi::SquareReversiPosition, 
             game::engine::native_evaluator,
             game::engine::no_cache_strategy,
-			game::engine::cache_strategy_helper_one_transfrom_in_cache>
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			false>
         SquareReversiEvaluator33;        
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::boostpool_cache_strategy,
+			game::engine::simple_cache_strategy_helper,
+			true>
+        SquareReversiEvaluator1_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::stdnew_cache_strategy,
+			game::engine::simple_cache_strategy_helper,
+			true>
+        SquareReversiEvaluator2_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::no_cache_strategy,
+			game::engine::simple_cache_strategy_helper,
+			true>
+        SquareReversiEvaluator3_s;        
+
+// ---------------------------------
+
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::boostpool_cache_strategy,
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			true>
+        SquareReversiEvaluator21_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::stdnew_cache_strategy,
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			true>
+        SquareReversiEvaluator22_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::no_cache_strategy,
+			game::engine::cache_strategy_helper_all_transfroms_in_cache,
+			true>
+        SquareReversiEvaluator23_s;        
+
+// ---------------------------------
+
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::boostpool_cache_strategy,
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			true>
+        SquareReversiEvaluator31_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::stdnew_cache_strategy,
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			true>
+        SquareReversiEvaluator32_s;
+        
+typedef game::engine::alpha_beta_pruning_evaluator<
+            game::square_reversi::SquareReversiPosition, 
+            game::engine::native_evaluator,
+            game::engine::no_cache_strategy,
+			game::engine::cache_strategy_helper_one_transfrom_in_cache,
+			true>
+        SquareReversiEvaluator33_s;        
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -99,6 +187,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	SquareReversiEvaluator31 e31;
 	SquareReversiEvaluator32 e32;
 	SquareReversiEvaluator33 e33;
+
+	SquareReversiEvaluator1 e1_s;
+	SquareReversiEvaluator2 e2_s;
+	SquareReversiEvaluator3 e3_s;
+
+	SquareReversiEvaluator21 e21_s;
+	SquareReversiEvaluator22 e22_s;
+	SquareReversiEvaluator23 e23_s;
+
+	SquareReversiEvaluator31 e31_s;
+	SquareReversiEvaluator32 e32_s;
+	SquareReversiEvaluator33 e33_s;
 
 	return 0;
 }
