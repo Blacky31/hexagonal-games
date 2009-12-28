@@ -200,6 +200,34 @@ int _tmain(int argc, _TCHAR* argv[])
 	SquareReversiEvaluator32 e32_s;
 	SquareReversiEvaluator33 e33_s;
 
+	game::square_reversi::SquareReversiPosition position;
+
+	signed int a, b, r;
+
+	e1.f2(10, position, a, b);
+	e2.f2(10, position, a, b);
+	e3.f2(10, position, a, b);
+
+	e21.f2(10, position, a, b);
+	e22.f2(10, position, a, b);
+	e23.f2(10, position, a, b);
+
+	e31.f2(10, position, a, b);
+	e32.f2(10, position, a, b);
+	e33.f2(10, position, a, b);
+
+	e1_s.f2(10, position, a, b);
+	e2_s.f2(10, position, a, b);
+	e3_s.f2(10, position, a, b);
+
+	e21_s.f2(10, position, a, b);
+	e22_s.f2(10, position, a, b);
+	e23_s.f2(10, position, a, b);
+
+	e31_s.f2(10, position, a, b);
+	e32_s.f2(10, position, a, b);
+	e33_s.f2(10, position, a, b);
+
 	return 0;
 }
 

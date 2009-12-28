@@ -73,7 +73,7 @@ template<
     if(need_return)
         return result;
     
-    if(!position->terminal_position_preanalize(result))
+    if(!position.terminal_position_preanalize(result))
     {
         if(0 >= depth)
         {
@@ -93,8 +93,7 @@ template<
 						position_evaluation_type t = 
 								g2(depth - 1, 
 									i_position, 
-									result, beta,
-									m_cache);
+									result, beta);
 						if(t > result)
 							result = t;
 						if(result >= beta)
@@ -114,7 +113,7 @@ template<
             if(!i)
             {
                 // it is terminal position
-                result = position->terminal_position_evaluate();
+                result = position.terminal_position_evaluate();
             }
             else 
             { 
@@ -124,8 +123,7 @@ template<
                     position_evaluation_type t = 
                             g2(depth - 1, 
 								i_position, 
-								result, beta,
-								m_cache);
+								result, beta);
                     if(t > result)
                         result = t;
                     if(result >= beta)
@@ -164,7 +162,7 @@ template<
     if(need_return)
         return result;
     
-    if(!position->terminal_position_preanalize(result))
+    if(!position.terminal_position_preanalize(result))
     {
         if(0 >= depth)
         {
@@ -184,8 +182,7 @@ template<
 						position_evaluation_type t = 
 								f2(depth - 1, 
 									i_position, 
-									result, beta,
-									m_cache);
+									alpha, result);
 						if(t > result)
 							result = t;
 						if(result >= beta)
@@ -205,7 +202,7 @@ template<
             if(!i)
             {
                 // it is terminal position
-                result = position->terminal_position_evaluate();
+                result = position.terminal_position_evaluate();
             }
             else 
             { 
@@ -216,8 +213,7 @@ template<
                         position_evaluation_type t = 
                                 f2(depth - 1, 
 									i_position, 
-									alpha, result,
-									m_cache);
+									alpha, result);
                         if(t < result)
                             result = t;
                         if(result <= alpha)
