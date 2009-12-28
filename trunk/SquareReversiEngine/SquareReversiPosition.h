@@ -6,6 +6,7 @@
 #include "../Engine/BoardGeometry.h"
 #include "../Engine/GameBoard.h"
 #include "SquareReversiSuccessorPositionsIterator.h"
+#include "SquareReversiSuccessorStablePositionsIterator.h"
 #include "SquareReversiTransformPositionsIterator.h"
 
 namespace game { namespace square_reversi {
@@ -18,6 +19,9 @@ public:
 	typedef signed int evaluation_type;
 	typedef SquareReversiSuccessorPositionsIterator<SquareReversiPosition, 8>
         successor_positions_iterator_type;
+
+	typedef SquareReversiSuccessorStablePositionsIterator<SquareReversiPosition, 8>
+        successor_stable_positions_iterator_type;
 
 	typedef SquareReversiTransformPositionsIterator<SquareReversiPosition, 8>
 		transformed_positions_iterator_type;
@@ -183,11 +187,6 @@ public:
         }
 	}
         
-    inline void successor_iterator_begin(successor_positions_iterator_type& i) const
-    {
-        i.begin_on_position(*this);
-    }
-
     inline bool terminal_position_preanalize(evaluation_type& result) const
     {
         if(is_pass_max() || 64 == (m_algorithmStonesOnBoard + m_opponentStonesOnBoard))

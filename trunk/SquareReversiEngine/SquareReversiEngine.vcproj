@@ -235,6 +235,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SquareReversiSuccessorStablePositionsIterator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SquareReversiTransformPositionsIterator.h"
 				>
 			</File>
