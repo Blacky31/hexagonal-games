@@ -69,7 +69,7 @@ public:
 
 private:
 
-    inline bool isValid()
+    inline bool isValid() const
     {
         return m_isValid;
     }

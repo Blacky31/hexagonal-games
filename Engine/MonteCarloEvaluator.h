@@ -3,6 +3,7 @@
 
 #include "BaseEvaluator.h"
 
+/*
 namespace game { namespace engine {
 
 static unsigned int monte_carlo_repeat_count = 10000;
@@ -50,5 +51,6 @@ private:
 
 } } // namespace engine, namespace game
 
+*/
 
 #endif // __MONTECARLOEVALUATOR__H

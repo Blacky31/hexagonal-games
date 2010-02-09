@@ -17,6 +17,7 @@ class SquareReversiPosition
 {
 public:
 	typedef signed int evaluation_type;
+		
 	typedef SquareReversiSuccessorPositionsIterator<SquareReversiPosition, 8>
         successor_positions_iterator_type;
 
