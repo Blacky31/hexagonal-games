@@ -50,6 +50,8 @@ struct square_game_board
 	void generate_cache_key(cache_type& buffer) const
 	{
 		unsigned int x = 0;
+		// !!!!!!!!!!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?
+		/*
 		BOOST_FOREACH(row_type& row, m_board)
 		{
 			buffer[x] = 0;
@@ -59,9 +61,9 @@ struct square_game_board
 				buffer[x] |= (cell << (BITS_PER_CELL_IN_CACHE * y));
 				y++;
 			}
-
 			++x;
 		}
+		 */
 	}
 
 	inline const cell_type& cell(const board_cell_coordinates& coordinates) const

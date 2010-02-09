@@ -24,6 +24,9 @@ public:
     typedef POSITION position_type;
     typedef typename position_type::cache_type cache_type;
 
+	typedef engine::square_board_transformer<SIZE> square_board_transformer;
+	typedef typename square_board_transformer::transfromation_function transfromation_function;
+	
 	SquareReversiTransformPositionsIterator(const position_type& position)
 		: m_current_transformation_number(0),
 		  m_cache_value(),
@@ -69,7 +72,7 @@ public:
 
 private:
 
-    inline bool isValid()
+    inline bool isValid() const
     {
         return m_isValid;
     }
@@ -82,8 +85,6 @@ private:
            return; 
         }
         
-		typedef engine::square_board_transformer<SIZE>::transfromation_function transfromation_function;
-
 		transfromation_function fun = engine::square_board_transformer<SIZE>::get_function(m_current_transformation_number);
 
 		engine::board_cell_coordinates coord(0, 0);
@@ -91,11 +92,12 @@ private:
         for(coord.m_x = 0; coord.m_x < SIZE; ++coord.m_x)
 			for(coord.m_y = 0; coord.m_y < SIZE; ++coord.m_y)
 			{
-				transformed_ccord = fun(coord);
+				engine::board_cell_coordinates transformed_ccord = fun(coord);
 				m_transformed_position.cell(transformed_ccord) = m_original_position->cell(coord);
 			}
-
-		m_transformed_position.generate_cache_key(m_cache_value);
+		
+		// !?!?!?!?!?!?!?!?!!?!?
+		//m_transformed_position.generate_cache_key(m_cache_value);
 
         ++m_current_transformation_number;
     }

@@ -26,8 +26,7 @@ public:
 		: m_current_coordinates(0, 0),
 		  m_result_buffer(),
 		  m_position(&position),
-		  m_isValid(true),
-		  m_move_was_generated(false)
+		  m_isValid(true)
 	{
 		next_position();
 	}
@@ -62,14 +61,14 @@ public:
         m_current_coordinates.m_x = 0;
         m_current_coordinates.m_y = 0;
         m_isValid = true;
-        m_move_was_generated = false;
 
 		next_position();
     }
 
 private:
 
-    inline bool isValid()
+	// !!!!!!!
+    inline bool isValid() const
     {
         return m_isValid;
     }
@@ -114,7 +113,7 @@ private:
 			}
 
 			if(process_in_board())
-				break;
+				return;
 		}
     }
 
